@@ -1,0 +1,7 @@
+texture_level,level_name,overall_accuracy,025_mug,006_mustard_bottle,035_power_drill,024_bowl,021_bleach_cleanser
+0,no_randomization,4.13,0.0,0.0,10.67,10.0,0.0
+10,textures_00010,29.57,0.0,0.0,0.0,66.83,81.0
+100,textures_00100,38.23,0.17,50.33,52.0,0.17,88.5
+500,textures_00500,47.93,11.83,33.67,97.67,25.83,70.67
+1000,textures_01000,48.43,10.17,48.5,91.17,3.0,89.33
+5000,textures_05000,35.5,18.33,15.83,44.17,0.0,99.17

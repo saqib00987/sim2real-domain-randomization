@@ -1,0 +1,6 @@
+PRETRAINED vs FROM-SCRATCH
+================================================
+
+Level                  Pretrained    Scratch     Diff
+no_randomization             8.6%      20.0%   -11.4%
+textures_01000              61.3%      25.0%    36.3%

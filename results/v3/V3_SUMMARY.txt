@@ -1,0 +1,68 @@
+V3 RESULTS SUMMARY
+============================================================
+
+TRAINING (stop epoch / final train acc / final val acc):
+  no_randomization           stop=13  train=100.0%  val=100.0%
+  textures_00010             stop=13  train=100.0%  val=100.0%
+  textures_00100             stop=14  train=99.9%  val=100.0%
+  textures_00500             stop=17  train=100.0%  val=100.0%
+  textures_01000             stop=24  train=100.0%  val=100.0%
+  textures_05000             stop=17  train=100.0%  val=99.2%
+
+TEST ACCURACY (overall + per class):
+  no_randomization           overall=8.6%  mug=35.2%  mustard_=4.3%  power_dr=3.7%  bowl=0.0%  bleach_c=0.0%
+  textures_00010             overall=25.7%  mug=0.0%  mustard_=0.0%  power_dr=29.0%  bowl=0.0%  bleach_c=99.7%
+  textures_00100             overall=47.1%  mug=8.3%  mustard_=48.5%  power_dr=92.5%  bowl=13.7%  bleach_c=72.3%
+  textures_00500             overall=46.6%  mug=37.2%  mustard_=35.8%  power_dr=74.7%  bowl=4.7%  bleach_c=80.8%
+  textures_01000             overall=61.3%  mug=30.3%  mustard_=55.5%  power_dr=99.2%  bowl=76.7%  bleach_c=44.7%
+  textures_05000             overall=37.6%  mug=0.0%  mustard_=37.0%  power_dr=72.0%  bowl=0.3%  bleach_c=78.7%
+
+CONFUSION MATRICES (rows=true, cols=pred, counts):
+
+  no_randomization:
+    mug  mustar  power_  bowl  bleach
+    mug        211    360     29      0      0
+    mustar     574     26      0      0      0
+    power_     227    351     22      0      0
+    bowl       206    378     16      0      0
+    bleach     542     45     13      0      0
+
+  textures_00010:
+    mug  mustar  power_  bowl  bleach
+    mug          0      0      0      0    600
+    mustar       0      0      1      0    599
+    power_       0      0    174      0    426
+    bowl         0      0      0      0    600
+    bleach       0      0      2      0    598
+
+  textures_00100:
+    mug  mustar  power_  bowl  bleach
+    mug         50      0    419      0    131
+    mustar       0    291    211      0     98
+    power_       0      0    555      0     45
+    bowl         3      0    118     82    397
+    bleach       0      0    166      0    434
+
+  textures_00500:
+    mug  mustar  power_  bowl  bleach
+    mug        223      0    101      0    276
+    mustar       0    215    262      0    123
+    power_      27      0    448      0    125
+    bowl        78      0      4     28    490
+    bleach       0      0    115      0    485
+
+  textures_01000:
+    mug  mustar  power_  bowl  bleach
+    mug        182      0    403     15      0
+    mustar       0    333    205     41     21
+    power_       0      2    595      3      0
+    bowl        20      0    120    460      0
+    bleach       0     61    227     44    268
+
+  textures_05000:
+    mug  mustar  power_  bowl  bleach
+    mug          0      0    204      0    396
+    mustar       8    222    184      0    186
+    power_       0      0    432      0    168
+    bowl         0      0     48      2    550
+    bleach      19      0     87     22    472

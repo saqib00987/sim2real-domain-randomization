@@ -1,0 +1,6 @@
+FROM-SCRATCH LEARNING-RATE ROBUSTNESS CHECK
+==================================================
+
+Level                  Scratch 1e-3 test acc
+no_randomization                       20.0%
+textures_01000                         28.4%
