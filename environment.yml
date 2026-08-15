@@ -1,0 +1,21 @@
+name: my_ai_env
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pytorch=2.2.1
+  - torchvision=0.17.1
+  - pytorch-cuda=12.1
+  - numpy
+  - pillow=10.4
+  - matplotlib
+  - pyyaml
+  - tqdm
+  - jupyter
+  - pip
+  - pip:
+      - pybullet==3.25
+      - opencv-python==4.10.0.84

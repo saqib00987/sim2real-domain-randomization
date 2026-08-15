@@ -1,0 +1,44 @@
+# ---- Large experiment data: regenerate, don't commit ----
+synthetic_images/
+synthetic_images_v*/
+data/synthetic/
+
+trained_models/
+trained_models_v*/
+*.pth
+*.pt
+*.ckpt
+
+# YCB assets: separately licensed, fetched by scripts/download_ycb.py
+data/ycb/
+meshes/
+*.obj
+*.mtl
+*.ply
+
+data/real_test/
+data/checkpoints/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# ---- Tooling / OS ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+*.bullet
+runs/
+wandb/
+
+# Local overrides (configs/default.yaml stays tracked)
+configs/local.yaml
+.env

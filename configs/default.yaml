@@ -1,0 +1,72 @@
+# Born in Simulation - experiment configuration
+#
+# Paths are relative to the repository root, so this runs unchanged on Windows,
+# Linux and macOS. Copy to configs/local.yaml (gitignored) to override.
+
+paths:
+  ycb_meshes:   data/ycb/meshes          # was: "3D mesh for simulation (16k )"
+  real_test:    data/ycb/real_test       # was: "RGB images for testing"
+  synthetic:    data/synthetic           # generated - not tracked
+  checkpoints:  data/checkpoints         # generated - not tracked
+  results:      results/v3
+  figures:      results/figures
+
+objects:                                 # order defines class indices 0-4
+  - 025_mug
+  - 006_mustard_bottle
+  - 035_power_drill
+  - 024_bowl
+  - 021_bleach_cleanser
+
+diversity_levels: [0, 10, 100, 500, 1000, 5000]
+
+dataset:
+  images_per_class: 5000       # V3 headline. V2 used 1000, V1 used 500.
+  image_size: 224
+  renderer: ER_TINY_RENDERER   # headless
+
+  # Seed-cycling:
+  #   s(i) = seed_base + obj_idx*obj_stride + level*level_stride + (i % level)
+  # The level term keeps levels distinct once level > images_per_class.
+  # Without it (the V1 bug) every level >= the image count renders the same data.
+  seed_base: 42
+  obj_stride: 1000000
+  level_stride: 100
+
+# Resampled per render. Note: lighting is NOT randomized.
+randomization:
+  camera_distance: [0.35, 0.75]    # metres
+  camera_yaw:      [0, 360]        # degrees
+  camera_pitch:    [-70, -15]      # degrees
+  distractors:     [0, 4]          # randomly coloured boxes per scene
+
+# The level-0 condition: one fixed scene, repeated.
+baseline:
+  floor_colour:    [0.6, 0.6, 0.6, 1.0]
+  object_colour:   [0.8, 0.2, 0.2, 1.0]
+  camera_distance: 0.5
+  camera_yaw:      45
+  camera_pitch:    -35
+
+model:
+  architecture: resnet18
+  pretrained: true             # --scratch overrides for the ablation
+  num_classes: 5
+
+training:
+  loss: cross_entropy
+  optimizer: adam
+  learning_rate: 0.0001
+  batch_size: 32
+  max_epochs: 100
+  early_stopping_patience: 12
+  val_split: 0.15              # stratified per class
+  split_seed: 42
+  num_workers: 0               # keep 0 on Windows
+
+evaluation:
+  test_images_per_class: 600   # 3000 real photographs total
+
+gradcam:
+  target_layer: layer4         # final convolutional block
+  compare_levels: [0, 1000]    # baseline vs. best diversity model
