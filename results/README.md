@@ -1,4 +1,4 @@
-# Results — three versions, and why all three are here
+# Results: three versions, and why all three are here
 
 Most repositories publish only the run that worked. This one publishes all three,
 because the failures are checkable and the story is only credible if you can verify it.
@@ -11,7 +11,7 @@ because the failures are checkable and the story is only credible if you can ver
 | Epochs | fixed 10 | fixed 10 | early stopping (patience 12, max 100) |
 | Validation split | none | none | 15% stratified per class |
 | LR schedule | plateau on train loss | plateau on train loss | early stopping on val loss |
-| From-scratch ablation | — | — | yes |
+| From-scratch ablation |, |, | yes |
 | Peak accuracy | invalid | 65.3% @ level 1,000 | 61.3% @ level 1,000 |
 
 ## Effective diversity per version
@@ -29,7 +29,7 @@ images per class. This is the crux of the whole version history:
 | 1,000 | **500** | 1,000 | 1,000 |
 | 5,000 | **500** | **1,000** | 5,000 |
 
-### V1 — `v1_buggy/`
+### V1: `v1_buggy/`
 
 The original seed rule omitted the level offset. With 500 images/class, every level ≥ 500
 satisfied `i mod level == i`, so levels 500, 1,000 and 5,000 drew the same seeds and
@@ -42,41 +42,41 @@ training variance.
 columns are the same render. The figure was built to confirm diversity and instead
 documents its absence.
 
-### V2 — `v2/`
+### V2: `v2/`
 
 Seed formula corrected, data doubled to 1,000/class. Levels 0–1,000 are now genuinely
 distinct. Level 5,000 still caps at 1,000 unique scenes, so **V2's level 1,000 and level
-5,000 are the same diversity drawn from disjoint seed ranges** — different scenes, equal
-count.
-
-That accident turned out to be the most useful thing in this repository. The two
-conditions differ by 24.5 points (65.3% vs 40.8%) despite having identical diversity,
-which measures run-to-run variance directly. V3's headline non-monotonic decline is
-23.7 points. See the main README for what follows from that.
+5,000 are the same diversity drawn from disjoint seed ranges**: different scenes, equal
+count. The gap between those two conditions is therefore an estimate of scene-sampling
+plus training variance at fixed diversity, and a useful sanity bound on how much of the
+V3 curve's shape could be noise.
 
 V2 has no validation split and steps its LR scheduler on training loss, so it had no
-mechanism to detect overfitting.
+mechanism to detect overfitting. That gap is what V3 closes.
 
-### V3 — `v3/`
+### V3: `v3/`
 
 5,000 images/class, so every level reaches its nominal count. Early stopping against a
 15% stratified per-class validation split replaces fixed-epoch training, and a
 from-scratch ablation isolates the contribution of ImageNet pretraining. These are the
 numbers reported in the paper.
 
-A caveat discovered afterwards: every model reached 99–100% accuracy on that validation
-split, and validation accuracy correlated **+0.006** with real-world accuracy. The split
-is drawn from the same synthetic renders, so it could not detect the failure that
-matters. Early stopping was therefore selecting checkpoints on noise, and the kept
-epochs ranged from 1 to 12 across conditions. `V3_SUMMARY.txt` has the full per-level
-training and test detail.
-
 ## Verifying the V1 collision yourself
 
-```python
+```bash
 # Under the V1 rule, image 50 gets the same seed at every level >= 100
+python - <<'PY'
 for level in (10, 100, 500, 1000, 5000):
     print(level, 42 + (50 % level))
+PY
+```
+
+Or compare the rendered files directly, if you have regenerated the V1 datasets:
+
+```bash
+md5sum synthetic_images/textures_00500/025_mug/0050.png \
+       synthetic_images/textures_01000/025_mug/0050.png \
+       synthetic_images/textures_05000/025_mug/0050.png
 ```
 
 ## Files
@@ -88,6 +88,8 @@ v1_buggy/  accuracy_results.csv
            accuracy_vs_diversity.png        the invalid curve
            dataset_verification.png         the seed collision, visible
            gradcam_model0_vs_model5.png
+           gradcam_per_class_best.png
+           renderer_test.png                renderer smoke test
 
 v2/        accuracy_results_v2.csv
            accuracy_curve_overall.png

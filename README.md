@@ -7,7 +7,7 @@ Six ResNet-18 classifiers were fine-tuned on **entirely synthetic** PyBullet ren
 and evaluated on **3,000 real photographs** they never saw during training. The only
 variable between them was how much visual diversity the renderer produced.
 
-Randomization takes real-world accuracy from **8.6% to 61.3%** — from below chance
+Randomization takes real-world accuracy from **8.6% to 61.3%**: from below chance
 to a working classifier, with zero real training images.
 
 A variance control run afterwards showed that the *shape* of the diversity curve is
@@ -37,7 +37,7 @@ which sounds like a broken experiment until you look at what it predicts.
   <img src="results/v3/confusion_norand.png" width="460" alt="Confusion matrix, no-randomization model">
 </p>
 
-It isn't guessing. It collapses onto two classes — 58.7% of its 3,000 predictions are
+It isn't guessing. It collapses onto two classes. 58.7% of its 3,000 predictions are
 "mug", 38.7% are "mustard bottle", and it never once predicts bowl or bleach cleanser.
 It has confidently learned a background shortcut that exists in simulation and not in
 reality, so it is *reliably* wrong rather than uniformly uncertain. Below-chance
@@ -62,14 +62,14 @@ Share of all 3,000 test predictions assigned to each class:
 
 Maximum entropy for five balanced classes is 2.32. Every model except level 1,000
 dumps between 49% and 94% of its predictions onto one class. Level 1,000 is the only
-condition that spreads predictions across all five — and correspondingly the only one
+condition that spreads predictions across all five, and correspondingly the only one
 that predicts "bowl" with any regularity, which is why bowl accuracy reaches 76.7%
 there and sits near zero everywhere else.
 
 Level 10 deserves its own caveat: 94.1% of its predictions are bleach cleanser, and
 its 25.7% comes almost entirely from 598/600 correct bleach plus 174 correct drills.
 It is a two-class predictor exhibiting the same collapse as the baseline, aimed at a
-different class — not a partial recovery.
+different class, not a partial recovery.
 
 The coherent account across the whole experiment: models trained on insufficiently
 diverse simulation learn a shortcut and collapse onto one or two classes when shown
@@ -82,14 +82,14 @@ real photographs. Diversity's function is to break that collapse.
 </p>
 
 Grad-CAM at the final convolutional block makes it visible. The no-randomization model
-attends to background — the wall behind the mug, the floor beneath the mustard bottle —
+attends to background (the wall behind the mug, the floor beneath the mustard bottle)
 and predicts wrongly. The best diversity model puts its attention on the object and
 predicts correctly. The bleach cleanser is the clearest case: the baseline scatters
 weak activation across the lower frame and answers "mug"; the diverse model
 concentrates a tight hotspot on the bottle.
 
 Randomization doesn't teach the model about colour. It makes background
-*uninformative*, forcing reliance on the one cue stable across renders — object shape.
+*uninformative*, forcing reliance on the one cue stable across renders: object shape.
 
 ## Pretraining ablation
 
@@ -98,7 +98,7 @@ Randomization doesn't teach the model about colour. It makes background
 | No randomization | 8.6% | 20.0% | 20.0% |
 | Level 1,000 | 61.3% | 25.0% | 28.4% |
 
-The 20.0% is not a result — it's a degenerate constant predictor emitting one class for
+The 20.0% is not a result. It's a degenerate constant predictor emitting one class for
 all 3,000 images, which happens to land exactly on chance.
 
 The from-scratch runs were repeated at a 10x higher learning rate, since 1e-4 is tuned
@@ -119,16 +119,16 @@ showed that decline cannot be distinguished from run-to-run variance.**
 
 The control was free, because it was already sitting in the V2 data. V2 used 1,000
 images per class, and the seed-cycling term `i mod level` means level 5,000 could only
-ever produce 1,000 unique scenes — `i` never exceeds 999. So in V2, **levels 1,000 and
+ever produce 1,000 unique scenes, because `i` never exceeds 999. So in V2, **levels 1,000 and
 5,000 had identical diversity**, differing only in which seeds drew the scenes.
 
 | | Level 1,000 | Level 5,000 | Drop |
 |---|---:|---:|---:|
-| V2 — identical diversity by construction | 65.3% | 40.8% | **−24.5** |
-| V3 — 1,000 vs 5,000 unique scenes | 61.3% | 37.6% | **−23.7** |
+| V2, identical diversity by construction | 65.3% | 40.8% | **−24.5** |
+| V3, 1,000 vs 5,000 unique scenes | 61.3% | 37.6% | **−23.7** |
 
-The V2 drop is pure scene-sampling and training variance. The V3 drop — the paper's
-headline finding — is the same magnitude to within 0.8 points.
+The V2 drop is pure scene-sampling and training variance. The V3 drop, which the paper reports as its
+headline finding, is the same magnitude to within 0.8 points.
 
 Measured against that noise floor:
 
@@ -143,8 +143,8 @@ Measured against that noise floor:
 
 **What this does and does not mean.** It does not mean the decline is false. It means
 this experiment cannot tell the difference between a real decline and noise, so
-asserting one is not supported. The central claim — that randomization dramatically
-improves sim-to-real transfer — survives at roughly twice the noise floor, appears in
+asserting one is not supported. The central claim, that randomization dramatically
+improves sim-to-real transfer, survives at roughly twice the noise floor, appears in
 both V2 and V3, and involves a qualitative change in failure mode, not just a higher
 number.
 
@@ -173,7 +173,7 @@ s(i) = s₀ + (i mod level)
 
 With 500 images per class, any level ≥ 500 satisfies `i mod level == i` for every
 `i < 500`. Levels 500, 1,000 and 5,000 drew the same seeds and generated
-**identical training data** — the run contained four distinct datasets, not six.
+**identical training data**. The run contained four distinct datasets, not six.
 Nothing crashed; the logs were clean. The only symptom was three numbers sitting
 suspiciously close together.
 
@@ -190,7 +190,7 @@ s(i) = s₀ + (obj × C_obj) + (level × C_lev) + (i mod level)
 
 This required regenerating every dataset and retraining every model, and the image
 budget was raised to 5,000/class. All three runs are preserved in `results/` so the
-collision is checkable rather than merely asserted — see
+collision is checkable rather than merely asserted. See
 [`results/README.md`](results/README.md).
 
 A silent data-generation bug is more dangerous than a crash, because it hands you
@@ -208,7 +208,7 @@ Each render loads the object's 16k YCB mesh, places it on a ground plane, and sa
 | Camera pitch | −70° to −15° |
 | Distractor boxes | 0 – 4, randomly coloured |
 
-Distractors follow Tobin et al. directly — they stop the network assuming the largest
+Distractors follow Tobin et al. directly: they stop the network assuming the largest
 or most central object is the target.
 
 <p align="center">
@@ -224,7 +224,7 @@ or most central object is the target.
 | Test | 3,000 real YCB photographs (600/class), zero real images in training |
 | Hardware | RTX 3060 Laptop, Python 3.11.11, PyTorch 2.2.1+cu121 |
 
-No layers are frozen — every parameter goes to the optimizer.
+No layers are frozen; every parameter goes to the optimizer.
 
 **Why this is not augmentation.** Image augmentation applies pixel transforms to
 existing photographs; the domain is still reality. Here each image is a fresh render of
@@ -277,15 +277,15 @@ checkpoints are deleted.
 ## Repository layout
 
 ```
-configs/     experiment configuration — paths, seeds, diversity levels
+configs/     experiment configuration: paths, seeds, diversity levels
 src/         dataset generation, training, evaluation, Grad-CAM
 scripts/     YCB download helper
 results/
-  v3/        headline run (5,000 img/class) — data, figures, summaries
-  v2/        1,000 img/class — also the source of the variance control
+  v3/        headline run (5,000 img/class): data, figures, summaries
+  v2/        1,000 img/class, also the source of the variance control
   v1_buggy/  original run, preserved to document the seed collision
   README.md  what each version is and how they differ
-notebooks/   experiment_v1 / v2 / v3 — the original working notebooks
+notebooks/   experiment_v1 / v2 / v3, the original working notebooks
 paper/       born_in_simulation.pdf (as submitted)
 ```
 
@@ -294,7 +294,7 @@ paper/       born_in_simulation.pdf (as submitted)
 [`paper/born_in_simulation.pdf`](paper/born_in_simulation.pdf)
 
 Written for **340.910 Seminar in Artificial Intelligence (Physical AI)**, Johannes
-Kepler University Linz — Prof. Alois Ferscha, supervised by Aftab Hussain.
+Kepler University Linz. Prof. Alois Ferscha, supervised by Aftab Hussain.
 
 The PDF is the version submitted for assessment. The variance analysis in this README
 was carried out afterwards and revises the paper's account of the level-5,000 decline;
@@ -303,5 +303,5 @@ once and that some non-monotonic behaviour may reflect training variance.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). The YCB object and model set is separately licensed by
+MIT. See [LICENSE](LICENSE). The YCB object and model set is separately licensed by
 Calli et al.
