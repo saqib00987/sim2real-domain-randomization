@@ -10,7 +10,7 @@ variable between them was how much visual diversity the renderer produced.
 Randomization takes real-world accuracy from **8.6% to 61.3%**: from below chance
 to a working classifier, with zero real training images.
 
-A variance control run afterwards showed that the *shape* of the diversity curve is
+A control run afterwards showed that the *shape* of the diversity curve is
 not resolvable at this scale. That analysis is in
 [What the variance check showed](#what-the-variance-check-showed), and it is the
 most interesting part of this repository.
@@ -52,28 +52,31 @@ Share of all 3,000 test predictions assigned to each class:
 | 0 | 58.7% | 38.7% | 2.7% | 0.0% | 0.0% | 1.12 | 8.6% |
 | 10 | 0.0% | 0.0% | 5.9% | 0.0% | **94.1%** | 0.32 | 25.7% |
 | 100 | 1.8% | 9.7% | 49.0% | 2.7% | 36.8% | 1.61 | 47.1% |
-| 500 | 10.9% | 7.2% | 31.0% | 0.9% | 50.0% | 1.65 | 46.6% |
-| 1,000 | 6.7% | 13.2% | 51.7% | 18.8% | 9.6% | **1.92** | 61.3% |
-| 5,000 | 0.9% | 7.4% | 31.9% | 0.7% | 59.1% | 1.25 | 37.6% |
+| 500 | 10.9% | 7.2% | 31.0% | 0.9% | 50.0% | 1.71 | 46.6% |
+| 1,000 | 6.7% | 13.2% | 51.7% | **18.8%** | 9.6% | **1.92** | 61.3% |
+| 5,000 | 0.9% | 7.4% | 31.9% | 0.7% | 59.1% | 1.37 | 37.6% |
 
 <p align="center">
   <img src="results/v3/confusion_matrices_v3.png" width="760" alt="Confusion matrices across all diversity levels">
 </p>
 
-Maximum entropy for five balanced classes is 2.32. Every model except level 1,000
-dumps between 49% and 94% of its predictions onto one class. Level 1,000 is the only
-condition that spreads predictions across all five, and correspondingly the only one
-that predicts "bowl" with any regularity, which is why bowl accuracy reaches 76.7%
-there and sits near zero everywhere else.
+Maximum entropy for five balanced classes is 2.32. Every model over-assigns to a
+dominant class, with the top share running from 49% to 94%. What separates level 1,000
+is not that it avoids this but that it is less lopsided across the remaining classes:
+entropy 1.92 against 0.32 to 1.71 elsewhere, and it is the only model that predicts
+"bowl" with any regularity, at 18.8% of its predictions against 0 to 2.7% at every
+other level. That is why bowl accuracy reaches 76.7% there and sits near zero
+everywhere else. Across the six models, prediction entropy correlates +0.72 with
+real-world accuracy.
 
 Level 10 deserves its own caveat: 94.1% of its predictions are bleach cleanser, and
-its 25.7% comes almost entirely from 598/600 correct bleach plus 174 correct drills.
+its 25.7% comes almost entirely from 598 of 600 correct bleach plus 174 correct drills.
 It is a two-class predictor exhibiting the same collapse as the baseline, aimed at a
 different class, not a partial recovery.
 
 The coherent account across the whole experiment: models trained on insufficiently
 diverse simulation learn a shortcut and collapse onto one or two classes when shown
-real photographs. Diversity's function is to break that collapse.
+real photographs. Diversity's function is to widen that collapse, not to eliminate it.
 
 ## What the network learns
 
@@ -119,27 +122,27 @@ showed that decline cannot be distinguished from run-to-run variance.**
 
 The control was free, because it was already sitting in the V2 data. V2 used 1,000
 images per class, and the seed-cycling term `i mod level` means level 5,000 could only
-ever produce 1,000 unique scenes, because `i` never exceeds 999. So in V2, **levels 1,000 and
-5,000 had identical diversity**, differing only in which seeds drew the scenes.
+ever produce 1,000 unique scenes, because `i` never exceeds 999. So in V2, **levels
+1,000 and 5,000 had identical diversity**, differing only in which seeds drew the scenes.
 
 | | Level 1,000 | Level 5,000 | Drop |
 |---|---:|---:|---:|
 | V2, identical diversity by construction | 65.3% | 40.8% | **−24.5** |
 | V3, 1,000 vs 5,000 unique scenes | 61.3% | 37.6% | **−23.7** |
 
-The V2 drop is pure scene-sampling and training variance. The V3 drop, which the paper reports as its
-headline finding, is the same magnitude to within 0.8 points.
+The V2 drop is pure scene-sampling and training variance. The V3 drop, which the paper
+reports as its headline finding, is the same magnitude to within 0.8 points.
 
 Measured against that noise floor:
 
 | Comparison | Effect | Status |
 |---|---:|---|
-| No randomization → level 1,000 | +52.7 | **Robust** |
-| No randomization → level 100 | +38.5 | **Robust** |
-| Pretrained → scratch @ level 1,000 | +32.9 | **Holds** |
-| Level 10 → level 100 | +21.4 | Within noise |
-| Level 100 → level 1,000 | +14.2 | Within noise |
-| Level 1,000 → level 5,000 | −23.7 | Within noise |
+| No randomization to level 1,000 | +52.7 | **Robust** |
+| No randomization to level 100 | +38.5 | **Robust** |
+| Pretrained vs from-scratch at level 1,000 | +32.9 | **Holds** |
+| Level 10 to level 100 | +21.4 | Within noise |
+| Level 100 to level 1,000 | +14.2 | Within noise |
+| Level 1,000 to level 5,000 | −23.7 | Within noise |
 
 **What this does and does not mean.** It does not mean the decline is false. It means
 this experiment cannot tell the difference between a real decline and noise, so
@@ -152,13 +155,15 @@ Two honest caveats on the caveat. The 24.5-point figure is a *single* pairwise
 difference, which is a crude estimate of variance; V2's level-5,000 run may have been
 an unlucky outlier. And it is probably an underestimate for V3, because V2 used fixed
 epochs while V3 added early stopping against a validation split that every model solved
-at 99–100% (validation accuracy correlated **+0.006** with real-world accuracy). That
-saturated signal also meant the kept checkpoints ranged from epoch 1 to epoch 12 across
-conditions, so effective training length varied uncontrolled.
+at 99 to 100%. Validation accuracy correlated **+0.006** with real-world accuracy across
+the six models, so the stopping signal carried no information about the outcome being
+measured. That saturated signal also meant the kept checkpoints ranged from epoch 1 to
+epoch 12 across conditions, so effective training length varied uncontrolled alongside
+diversity.
 
-The experiment that would settle this is three seeds per condition at 1,000 images per
-class with fixed epochs, producing an accuracy curve with error bars. That is the
-outstanding work on this project.
+The experiment that would settle this is repeated runs per condition with fixed epochs,
+producing an accuracy curve with error bars. That is the outstanding work on this
+project.
 
 ## What went wrong (the first time)
 
@@ -168,10 +173,10 @@ levels 500, 1,000 and 5,000 all reported near-identical accuracy.
 Diversity is controlled by seed-cycling. The original rule omitted the level offset:
 
 ```
-s(i) = s₀ + (i mod level)
+s(i) = s0 + (i mod level)
 ```
 
-With 500 images per class, any level ≥ 500 satisfies `i mod level == i` for every
+With 500 images per class, any level >= 500 satisfies `i mod level == i` for every
 `i < 500`. Levels 500, 1,000 and 5,000 drew the same seeds and generated
 **identical training data**. The run contained four distinct datasets, not six.
 Nothing crashed; the logs were clean. The only symptom was three numbers sitting
@@ -179,13 +184,13 @@ suspiciously close together.
 
 The verification figure built to confirm diversity is what documents its absence:
 `results/v1_buggy/dataset_verification.png` samples image index 50 across levels, and
-because `50 mod level == 50` for every level ≥ 100, four of its columns are the same
+because `50 mod level == 50` for every level >= 100, four of its columns are the same
 render.
 
 The corrected rule adds object and level offsets, guaranteeing disjoint seed ranges:
 
 ```
-s(i) = s₀ + (obj × C_obj) + (level × C_lev) + (i mod level)
+s(i) = s0 + (obj * C_obj) + (level * C_lev) + (i mod level)
 ```
 
 This required regenerating every dataset and retraining every model, and the image
@@ -202,11 +207,11 @@ Each render loads the object's 16k YCB mesh, places it on a ground plane, and sa
 
 | Parameter | Range |
 |---|---|
-| Object + floor colour | random RGBA |
-| Camera distance | 0.35 – 0.75 m |
-| Camera yaw | 0 – 360° |
-| Camera pitch | −70° to −15° |
-| Distractor boxes | 0 – 4, randomly coloured |
+| Object and floor colour | random RGBA |
+| Camera distance | 0.35 to 0.75 m |
+| Camera yaw | 0 to 360 degrees |
+| Camera pitch | -70 to -15 degrees |
+| Distractor boxes | 0 to 4, randomly coloured |
 
 Distractors follow Tobin et al. directly: they stop the network assuming the largest
 or most central object is the target.
@@ -218,9 +223,9 @@ or most central object is the target.
 | | |
 |---|---|
 | Renderer | PyBullet 3.25, `ER_TINY_RENDERER`, headless |
-| Objects | 5 × YCB: mug, mustard bottle, power drill, bowl, bleach cleanser |
-| Model | ResNet-18, ImageNet-pretrained, `Linear(512→5)` head, **full fine-tuning** |
-| Training | 5,000 img/class (150,000 total), Adam @ 1e-4, batch 32, early stopping (patience 12, max 100 epochs), 15% stratified per-class validation split |
+| Objects | 5 YCB items: mug, mustard bottle, power drill, bowl, bleach cleanser |
+| Model | ResNet-18, ImageNet-pretrained, `Linear(512 -> 5)` head, **full fine-tuning** |
+| Training | 5,000 img/class (150,000 total), Adam at 1e-4, batch 32, early stopping (patience 12, max 100 epochs), 15% stratified per-class validation split |
 | Test | 3,000 real YCB photographs (600/class), zero real images in training |
 | Hardware | RTX 3060 Laptop, Python 3.11.11, PyTorch 2.2.1+cu121 |
 
@@ -237,7 +242,7 @@ transforms.
 - **Single runs.** Each condition was trained once. As the variance check above shows,
   this is the binding limitation on everything except the largest effects.
 - **Saturated validation split.** The 15% split is drawn from the same synthetic
-  renders, and every model solved it at 99–100%. It could not detect the failure that
+  renders, and every model solved it at 99 to 100%. It could not detect the failure that
   matters, and using it for early stopping meant checkpoints were selected on noise.
   A future version should either use fixed epochs or hold out a small set of real
   images purely for stopping.
