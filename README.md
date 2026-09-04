@@ -10,10 +10,10 @@ variable between them was how much visual diversity the renderer produced.
 Randomization takes real-world accuracy from **8.6% to 61.3%**: from below chance
 to a working classifier, with zero real training images.
 
-A control run afterwards showed that the *shape* of the diversity curve is
-not resolvable at this scale. That analysis is in
-[What the variance check showed](#what-the-variance-check-showed), and it is the
-most interesting part of this repository.
+A control comparison afterwards showed that the *shape* of the curve should be read
+with caution: two conditions with identical diversity differed by as much as the
+curve's headline feature. See
+[What the variance check showed](#what-the-variance-check-showed).
 
 <p align="center">
   <img src="results/v3/accuracy_curve_overall.png" width="640" alt="Accuracy vs. colour diversity">
