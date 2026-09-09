@@ -183,9 +183,13 @@ Nothing crashed; the logs were clean. The only symptom was three numbers sitting
 suspiciously close together.
 
 The verification figure built to confirm diversity is what documents its absence:
-`results/v1_buggy/dataset_verification.png` samples image index 50 across levels, and
-because `50 mod level == 50` for every level >= 100, four of its columns are the same
-render.
+
+<p align="center">
+  <img src="results/v1_buggy/dataset_verification.png" width="700" alt="V1 dataset verification grid: four identical columns">
+</p>
+
+It samples image index 50 across levels, and because `50 mod level == 50` for every
+level >= 100, four of its columns are the same render.
 
 The corrected rule adds object and level offsets, guaranteeing disjoint seed ranges:
 
